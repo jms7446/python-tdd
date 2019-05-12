@@ -1,0 +1,15 @@
+----------ChromeDriver 73.0.3683.68 (2019-03-06)----------
+Supports Chrome version 73
+Resolved issue 2768: ChromeDriver produces unexpected debug.log file if verbose logging is enabled [[Pri-1]]
+Resolved issue 2728: Is Element Displayed command does not work correctly with v0 shadow DOM inserts [[Pri-1]]
+Resolved issue 2799: Recent change to WebDriver Tests causes ChromeDriver to fail W3C Tests [[Pri-2]]
+Resolved issue 2744: Execute Script returns wrong error code when JavaScript returns a cyclic data structure [[Pri-2]]
+Resolved issue 1529: OnResponse behavior can lead to port exhaustion [[Pri-2]]
+Resolved issue 2736: Close Window command should handle user prompts based on session capabilities [[Pri-2]]
+Resolved issue 1963: Sending keys to disabled element should throw Element Not interactable error [[Pri-2]]
+Resolved issue 2679: Timeout value handling is not spec compliant [[Pri-2]]
+Resolved issue 2002: Add Cookie is not spec compliant [[Pri-2]]
+Resolved issue 2716: Clearing Text Boxes [[Pri-3]]
+Resolved issue 2714: ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:15756. Could not start driver. [[Pri-3]]
+Resolved issue 2722: Execute Script does not correctly convert document.all into JSON format [[Pri-3]]
+Resolved issue 2681: ChromeDriver doesn't differentiate "no such element" and "stale element reference" [[Pri-3]]
