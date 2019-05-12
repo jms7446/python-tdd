@@ -4,11 +4,10 @@ import os
 from selenium import webdriver
 
 
-def _make_driver(browser_type):
+def make_driver(browser_type):
     system_type = platform.system()
-    print('detected os: {}'.format(system_type))
     src_dir = os.path.dirname(os.path.abspath(__file__))
-    executable_dir = os.path.join(src_dir, '..', 'chromedriver')
+    executable_dir = os.path.join(src_dir, '.', 'chromedriver')
     if browser_type in ['chrome', 'h_chrome']:
         options = webdriver.ChromeOptions()
         options.add_argument('window-size=800x600')
