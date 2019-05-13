@@ -13,6 +13,12 @@ def browser():
     browser.quit()
 
 
+def assert_text_in_table_rows(browser, row_text):
+    table = browser.find_element_by_id('id_list_table')
+    rows = table.find_elements_by_tag_name('tr')
+    assert row_text in [row.text for row in rows]
+
+
 def test_can_start_a_list_and_retrieve_it_later(browser):
     # Edith has heard about a cool new online to-do app. She goes
     # to check out its homepage
@@ -37,19 +43,24 @@ def test_can_start_a_list_and_retrieve_it_later(browser):
     input_box.send_keys(Keys.ENTER)
     time.sleep(1)
 
-    table = browser.find_element_by_id('id_list_table')
-    rows = table.find_elements_by_tag_name('tr')
-    assert any(row.text == '1: Buy peacock feathers' for row in rows), "New to-do item did not appear in table"
+    # assert any(row.text == '1: Buy peacock feathers' for row in rows), f"contents: {table.text}"
+    assert_text_in_table_rows(browser, '1: Buy peacock feathers')
 
     # There is still a text box inviting her to add another item.
     # She enters "Use peacock feathers to make a fly" (Edith is very methodical)
-    raise Exception('Finish the test!')
+    input_box = browser.find_element_by_id('id_new_item')
+    input_box.send_keys('Use peacock feathers to make a fly')
+    input_box.send_keys(Keys.ENTER)
+    time.sleep(1)
 
     # The page updates again, and now shows both items on her list
+    assert_text_in_table_rows(browser, '1: Buy peacock feathers')
+    assert_text_in_table_rows(browser, '2: Use peacock feathers to make a fly')
 
     # Edith wonders whether the site will remember her list. Then she sees
     # that the site has generated a unique URL for her -- there is some
     # explanatory text to that effect.
+    raise Exception('Finish the test!')
 
     # She visits that URL - her to-do list is still there.
 

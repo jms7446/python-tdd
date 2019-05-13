@@ -14,6 +14,10 @@ from lists.views import home_page
 #         self.assertEqual(1 + 1, 3)
 
 
+def is_template_used(response, template_name):
+    return template_name in (t.name for t in response.templates)
+
+
 ################################################################################
 # Homepage
 ################################################################################
@@ -25,12 +29,11 @@ def test_root_url_resolvers_to_home_page_view():
 
 def test_uses_home_templates(client):
     response = client.get('/')
-    assert 'home.html' in (t.name for t in response.templates)
+    assert is_template_used(response, 'home.html')
 
 
-def test_home_page_returns_correct_html():
-    request = HttpRequest()
-    response = home_page(request)
-    html = response.content.decode('utf8')
-    expected_html = render_to_string('home.html')
-    assert html == expected_html
+def test_can_save_a_post_request(client):
+    item_text = 'A new list item'
+    response = client.post('/', data={'item_text': item_text})
+    assert item_text in response.content.decode()
+    assert is_template_used(response, 'home.html')
