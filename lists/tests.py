@@ -30,10 +30,14 @@ def test_uses_home_templates(client):
     assert_template_used(response, 'home.html')
 
 
+################################################################################
+# NewList
+################################################################################
+
 @pytest.mark.django_db
 def test_can_save_a_post_request(client):
     item_text = 'A new list item'
-    _ = client.post('/', data={'item_text': item_text})
+    _ = client.post('/lists/new', data={'item_text': item_text})
     assert Item.objects.count() == 1
     new_item = Item.objects.first()
     assert new_item.text == item_text
@@ -42,7 +46,7 @@ def test_can_save_a_post_request(client):
 @pytest.mark.django_db
 def test_redirects_after_post(client):
     item_text = 'A new list item'
-    response = client.post('/', data={'item_text': item_text})
+    response = client.post('/lists/new', data={'item_text': item_text})
     assert response.status_code == 302
     assert response['location'] == '/lists/one-list/'
 
