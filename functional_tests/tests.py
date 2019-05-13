@@ -19,10 +19,10 @@ def assert_text_in_table_rows(browser, row_text):
     assert row_text in [row.text for row in rows]
 
 
-def test_can_start_a_list_and_retrieve_it_later(browser):
+def test_can_start_a_list_and_retrieve_it_later(browser, live_server):
     # Edith has heard about a cool new online to-do app. She goes
     # to check out its homepage
-    browser.get('http://localhost:8000')
+    browser.get(live_server.url)
 
     # she notices the page title and header mention to-do lists
     print(browser.title)
