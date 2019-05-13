@@ -1,18 +1,8 @@
 import pytest
-from pytest_django import plugin
-# from django.test import TestCase
 from django.urls import resolve
-from django.http import HttpRequest
-from django.template.loader import render_to_string
 
 from lists.views import home_page
 from lists.models import Item
-
-
-# class SmokeTest(TestCase):
-#
-#     def test_bad_maths(self):
-#         self.assertEqual(1 + 1, 3)
 
 
 def is_template_used(response, template_name):
@@ -28,16 +18,44 @@ def test_root_url_resolvers_to_home_page_view():
     assert found.func == home_page
 
 
+@pytest.mark.django_db
+def test_only_saves_items_when_necessary(client):
+    client.get('/')
+    assert Item.objects.count() == 0
+
+
+@pytest.mark.django_db
 def test_uses_home_templates(client):
     response = client.get('/')
     assert is_template_used(response, 'home.html')
 
 
+@pytest.mark.django_db
 def test_can_save_a_post_request(client):
     item_text = 'A new list item'
     response = client.post('/', data={'item_text': item_text})
-    assert item_text in response.content.decode()
-    assert is_template_used(response, 'home.html')
+    assert Item.objects.count() == 1
+    new_item = Item.objects.first()
+    assert new_item.text == item_text
+
+
+@pytest.mark.django_db
+def test_redirects_after_post(client):
+    item_text = 'A new list item'
+    response = client.post('/', data={'item_text': item_text})
+    assert response.status_code == 302
+    assert response['location'] == '/'
+
+
+@pytest.mark.django_db
+def test_displays_all_list_items(client):
+    Item.objects.create(text='itemey 1')
+    Item.objects.create(text='itemey 2')
+
+    response = client.get('/')
+
+    assert 'itemey 1' in response.content.decode()
+    assert 'itemey 2' in response.content.decode()
 
 
 ################################################################################
