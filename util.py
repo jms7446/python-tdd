@@ -4,7 +4,7 @@ import os
 from selenium import webdriver
 
 
-def make_driver(browser_type):
+def make_driver(browser_type='chrome'):
     system_type = platform.system()
     src_dir = os.path.dirname(os.path.abspath(__file__))
     executable_dir = os.path.join(src_dir, '.', 'chromedriver')
