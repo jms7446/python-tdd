@@ -1,4 +1,5 @@
 import re
+import os
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,6 +19,16 @@ def browser():
     browser.quit()
 
 
+@fixture
+def live_server_url(live_server):
+    staging_server = os.environ.get('STAGING_SERVER')
+    if staging_server:
+        url = 'http://' + staging_server
+    else:
+        url = live_server.url
+    yield url
+
+
 def find_element_by_id_with_wait(browser, elem_id, wait=MAX_WAIT):
     elem = WebDriverWait(browser, wait).until(
         ec.presence_of_element_located((By.ID, elem_id))
@@ -31,10 +42,10 @@ def assert_text_in_table_rows(browser, row_text):
     assert row_text in [row.text for row in rows]
 
 
-def test_can_start_a_list_for_one_user(browser, live_server):
+def test_can_start_a_list_for_one_user(browser, live_server_url):
     # Edith has heard about a cool new online to-do app. She goes
     # to check out its homepage
-    browser.get(live_server.url)
+    browser.get(live_server_url)
 
     # she notices the page title and header mention to-do lists
     print(browser.title)
@@ -70,10 +81,10 @@ def test_can_start_a_list_for_one_user(browser, live_server):
     # Satisfied, she goes back to sleep
 
 
-def test_multiple_users_can_start_lists_at_different_urls(browser, live_server):
+def test_multiple_users_can_start_lists_at_different_urls(browser, live_server_url):
     # Edith starts a new to-do list
     # browser = make_driver()
-    browser.get(live_server.url)
+    browser.get(live_server_url)
     input_box = browser.find_element_by_id('id_new_item')
     input_box.send_keys('Buy peacock feathers')
     input_box.send_keys(Keys.ENTER)
@@ -90,7 +101,7 @@ def test_multiple_users_can_start_lists_at_different_urls(browser, live_server):
     browser.delete_all_cookies()
 
     # Francis visits the home page. There is no sign of Edith's list
-    browser.get(live_server.url)
+    browser.get(live_server_url)
     page_text = browser.find_element_by_tag_name('body').text
     assert 'Buy peacock feathers' not in page_text
     assert 'make a fly' not in page_text
@@ -115,9 +126,9 @@ def test_multiple_users_can_start_lists_at_different_urls(browser, live_server):
     # Satisfied, they both go back to sleep
 
 
-def test_layout_and_styling(browser, live_server):
+def test_layout_and_styling(browser, live_server_url):
     # Edith goes to the home page
-    browser.get(live_server.url)
+    browser.get(live_server_url)
     browser.set_window_size(1024, 768)
 
     # She notices the input box is nicely centered
