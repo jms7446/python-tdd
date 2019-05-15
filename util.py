@@ -24,7 +24,7 @@ def make_driver(browser_type='chrome'):
         executable_path = os.path.join(executable_dir, executable_name)
 
         driver = webdriver.Chrome(executable_path=executable_path,
-                                  chrome_options=options,
+                                  options=options,
                                   service_log_path=os.path.devnull)
     else:
         raise ValueError("Unknown browser : %s" % browser_type)
