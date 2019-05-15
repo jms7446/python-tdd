@@ -1,4 +1,3 @@
-import time
 import re
 
 from selenium.webdriver.common.keys import Keys
@@ -131,4 +130,3 @@ def test_layout_and_styling(browser, live_server):
     assert_text_in_table_rows(browser, '1: testing')
     inputbox = browser.find_element_by_id('id_new_item')
     assert inputbox.location['x'] + inputbox.size['width'] / 2 == approx(512, abs=10)
-
