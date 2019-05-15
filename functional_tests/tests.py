@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
-from pytest import fixture
+from pytest import fixture, approx
 
 from util import make_driver
 
@@ -19,7 +19,7 @@ def browser():
     browser.quit()
 
 
-def find_element_by_id_with_wait(browser, elem_id, wait):
+def find_element_by_id_with_wait(browser, elem_id, wait=MAX_WAIT):
     elem = WebDriverWait(browser, wait).until(
         ec.presence_of_element_located((By.ID, elem_id))
     )
@@ -114,3 +114,21 @@ def test_multiple_users_can_start_lists_at_different_urls(browser, live_server):
     assert 'Buy milk' in page_text
 
     # Satisfied, they both go back to sleep
+
+
+def test_layout_and_styling(browser, live_server):
+    # Edith goes to the home page
+    browser.get(live_server.url)
+    browser.set_window_size(1024, 768)
+
+    # She notices the input box is nicely centered
+    inputbox = browser.find_element_by_id('id_new_item')
+    assert inputbox.location['x'] + inputbox.size['width'] / 2 == approx(512, abs=10)
+
+    # She starts a new list and sees the input is nicely centered there too
+    inputbox.send_keys('testing')
+    inputbox.send_keys(Keys.ENTER)
+    assert_text_in_table_rows(browser, '1: testing')
+    inputbox = browser.find_element_by_id('id_new_item')
+    assert inputbox.location['x'] + inputbox.size['width'] / 2 == approx(512, abs=10)
+
