@@ -1,6 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 *.pyc
-venv
-db.sqlite3
-scrachpad.txt
-static
+/venv
+/db.sqlite3
+/scrachpad.txt
+/static/
