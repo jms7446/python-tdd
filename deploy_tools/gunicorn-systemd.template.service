@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn server for DOMAIN
+
+[Service]
+Restart=on-failure
+User=msjung
+WorkingDirectory=/home/msjung/sites/DOMAIN
+EnvironmentFile=/home/msjung/sites/DOMAIN/.env
+
+ExecStart=/home/msjung/sites/DOMAIN/venv/bin/gunicorn \
+    --bind unix:/tmp/DOMAIN.socket \
+    config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
