@@ -64,7 +64,7 @@ def test_can_save_a_post_request_to_an_existing_list(client):
     correct_list = List.objects.create()
 
     client.post(
-        f'/lists/{correct_list.id}/add_item',
+        f'/lists/{correct_list.id}/',
         data={'item_text': 'A new item for an existing list'},
     )
 
@@ -74,12 +74,12 @@ def test_can_save_a_post_request_to_an_existing_list(client):
     assert new_item.list == correct_list
 
 
-def test_redirects_to_list_view(client):
+def test_POST_redirects_to_list_view(client):
     List.objects.create()
     correct_list = List.objects.create()
 
     response = client.post(
-        f'/lists/{correct_list.id}/add_item',
+        f'/lists/{correct_list.id}/',
         data={'item_text': 'A new item for an existing list'},
     )
 
