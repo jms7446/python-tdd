@@ -1,16 +1,12 @@
 import pytest
 
+from django.core.exceptions import ValidationError
+
 from lists.models import Item, List
 
 
-################################################################################
-# ItemModel
-################################################################################
-
-@pytest.mark.django_db
 def test_saving_and_retrieving_items():
     list_ = List.objects.create()
-
     first_item = Item()
     first_text = 'The first (ever) list item'
     first_item.text = first_text
@@ -35,3 +31,12 @@ def test_saving_and_retrieving_items():
     assert first_saved_item.list == list_
     assert second_saved_item.text == second_text
     assert second_saved_item.list == list_
+
+
+def test_cannot_save_empty_list_items():
+    list_ = List.objects.create()
+    item = Item(list=list_, text='')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+        item.save()
+    assert Item.objects.count() == 0

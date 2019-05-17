@@ -13,7 +13,7 @@ def test_cannot_add_empty_list_items(browser, live_server_url):
     # The home page refreshes, and there is an error message saying that
     # list items cannot be blank
     elem = wait_for(browser.find_element_by_css_selector, '.has-error', wait_time=1)
-    assert "You can'n have an empty list item" in elem.text
+    assert "You can't have an empty list item" in elem.text
 
     # She tries again with some text for the item, which now works
     get_new_item_input_box(browser).send_keys('Buy milk', Keys.ENTER)

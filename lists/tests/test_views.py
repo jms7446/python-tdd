@@ -1,13 +1,10 @@
 import pytest
 from django.urls import resolve
 from django.test import SimpleTestCase
+from django.utils.html import escape
 
 from lists.views import home_page
 from lists.models import Item, List
-
-
-def assert_template_used(response, template_name):
-    assert template_name in [t.name for t in response.templates]
 
 
 ################################################################################
@@ -19,16 +16,15 @@ def test_root_url_resolvers_to_home_page_view():
     assert found.func == home_page
 
 
-def test_uses_home_templates(client):
+def test_uses_home_templates(client, test_case):
     response = client.get('/')
-    assert_template_used(response, 'home.html')
+    test_case.assertTemplateUsed(response, 'home.html')
 
 
 ################################################################################
 # NewList
 ################################################################################
 
-@pytest.mark.django_db
 def test_can_save_a_post_request(client):
     client.post('/lists/new', data={'item_text': 'A new list item'})
     assert Item.objects.count() == 1
@@ -36,19 +32,33 @@ def test_can_save_a_post_request(client):
     assert new_item.text == 'A new list item'
 
 
-@pytest.mark.django_db
-def test_redirects_after_post(client):
+def test_redirects_after_post(client, test_case):
     item_text = 'A new list item'
     response = client.post('/lists/new', data={'item_text': item_text})
     new_list = List.objects.first()
-    SimpleTestCase().assertRedirects(response, f'/lists/{new_list.id}/')
+    test_case.assertRedirects(response, f'/lists/{new_list.id}/')
+
+
+def test_validation_errors_are_sent_back_to_home_page_template(client, test_case):
+    response = client.post('/lists/new', data={'item_text': ''})
+
+    assert response.status_code == 200
+    test_case.assertTemplateUsed(response, 'home.html')
+    expected_error = escape("You can't have an empty list item")
+    test_case.assertContains(response, expected_error)
+
+
+def test_invalid_list_items_are_not_saved(client):
+    client.post('/lists/new', data={'item_text': ''})
+
+    assert List.objects.count() == 0
+    assert Item.objects.count() == 0
 
 
 ################################################################################
 # NewItem
 ################################################################################
 
-@pytest.mark.django_db
 def test_can_save_a_post_request_to_an_existing_list(client):
     List.objects.create()
     correct_list = List.objects.create()
@@ -64,7 +74,6 @@ def test_can_save_a_post_request_to_an_existing_list(client):
     assert new_item.list == correct_list
 
 
-@pytest.mark.django_db
 def test_redirects_to_list_view(client):
     List.objects.create()
     correct_list = List.objects.create()
@@ -81,7 +90,6 @@ def test_redirects_to_list_view(client):
 # ListView
 ################################################################################
 
-@pytest.mark.django_db
 def test_uses_correct_template(client):
     List.objects.create()
     correct_list = List.objects.create()
@@ -91,7 +99,6 @@ def test_uses_correct_template(client):
     SimpleTestCase().assertTemplateUsed(response, 'list.html')
 
 
-@pytest.mark.django_db
 def test_passes_correct_list_to_template(client):
     _ = List.objects.create()
     correct_list = List.objects.create()
@@ -101,7 +108,6 @@ def test_passes_correct_list_to_template(client):
     assert response.context['list'] == correct_list
 
 
-@pytest.mark.django_db
 def test_displays_all_items(client):
     list_ = List.objects.create()
     Item.objects.create(text='itemey 1', list=list_)
