@@ -1,45 +1,8 @@
 import re
-import os
 
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from pytest import fixture, approx
 
-from util import make_driver
-
-MAX_WAIT = 3
-
-
-@fixture
-def browser():
-    browser = make_driver('chrome')
-    yield browser
-    browser.quit()
-
-
-@fixture
-def live_server_url(live_server):
-    staging_server = os.environ.get('STAGING_SERVER')
-    if staging_server:
-        url = 'http://' + staging_server
-    else:
-        url = live_server.url
-    yield url
-
-
-def find_element_by_id_with_wait(browser, elem_id, wait=MAX_WAIT):
-    elem = WebDriverWait(browser, wait).until(
-        ec.presence_of_element_located((By.ID, elem_id))
-    )
-    return elem
-
-
-def assert_text_in_table_rows(browser, row_text):
-    table = find_element_by_id_with_wait(browser, 'id_list_table', MAX_WAIT)
-    rows = table.find_elements_by_tag_name('tr')
-    assert row_text in [row.text for row in rows]
+from .conftest import *
 
 
 def test_can_start_a_list_for_one_user(browser, live_server_url):
@@ -66,7 +29,7 @@ def test_can_start_a_list_for_one_user(browser, live_server_url):
     input_box.send_keys(Keys.ENTER)
 
     # assert any(row.text == '1: Buy peacock feathers' for row in rows), f"contents: {table.text}"
-    assert_text_in_table_rows(browser, '1: Buy peacock feathers')
+    assert_text_in_table_rows_with_wait(browser, '1: Buy peacock feathers')
 
     # There is still a text box inviting her to add another item.
     # She enters "Use peacock feathers to make a fly" (Edith is very methodical)
@@ -75,20 +38,19 @@ def test_can_start_a_list_for_one_user(browser, live_server_url):
     input_box.send_keys(Keys.ENTER)
 
     # The page updates again, and now shows both items on her list
-    assert_text_in_table_rows(browser, '1: Buy peacock feathers')
-    assert_text_in_table_rows(browser, '2: Use peacock feathers to make a fly')
+    assert_text_in_table_rows_with_wait(browser, '1: Buy peacock feathers')
+    assert_text_in_table_rows_with_wait(browser, '2: Use peacock feathers to make a fly')
 
     # Satisfied, she goes back to sleep
 
 
 def test_multiple_users_can_start_lists_at_different_urls(browser, live_server_url):
     # Edith starts a new to-do list
-    # browser = make_driver()
     browser.get(live_server_url)
     input_box = browser.find_element_by_id('id_new_item')
     input_box.send_keys('Buy peacock feathers')
     input_box.send_keys(Keys.ENTER)
-    assert_text_in_table_rows(browser, '1: Buy peacock feathers')
+    assert_text_in_table_rows_with_wait(browser, '1: Buy peacock feathers')
 
     # She notices that her list has a unique URL
     edith_list_url = browser.current_url
@@ -111,7 +73,7 @@ def test_multiple_users_can_start_lists_at_different_urls(browser, live_server_u
     input_box = browser.find_element_by_id('id_new_item')
     input_box.send_keys('Buy milk')
     input_box.send_keys(Keys.ENTER)
-    assert_text_in_table_rows(browser, '1: Buy milk')
+    assert_text_in_table_rows_with_wait(browser, '1: Buy milk')
 
     # Francis gets his own unique URL
     francis_list_url = browser.current_url
@@ -124,20 +86,3 @@ def test_multiple_users_can_start_lists_at_different_urls(browser, live_server_u
     assert 'Buy milk' in page_text
 
     # Satisfied, they both go back to sleep
-
-
-def test_layout_and_styling(browser, live_server_url):
-    # Edith goes to the home page
-    browser.get(live_server_url)
-    browser.set_window_size(1024, 768)
-
-    # She notices the input box is nicely centered
-    inputbox = browser.find_element_by_id('id_new_item')
-    assert inputbox.location['x'] + inputbox.size['width'] / 2 == approx(512, abs=10)
-
-    # She starts a new list and sees the input is nicely centered there too
-    inputbox.send_keys('testing')
-    inputbox.send_keys(Keys.ENTER)
-    assert_text_in_table_rows(browser, '1: testing')
-    inputbox = browser.find_element_by_id('id_new_item')
-    assert inputbox.location['x'] + inputbox.size['width'] / 2 == approx(512, abs=10)
