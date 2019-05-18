@@ -40,3 +40,8 @@ def test_cannot_save_empty_list_items():
         item.full_clean()
         item.save()
     assert Item.objects.count() == 0
+
+
+def test_get_absolute_url():
+    list_ = List.objects.create()
+    assert list_.get_absolute_url() == f'/lists/{list_.id}/'
