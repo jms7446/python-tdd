@@ -24,7 +24,7 @@ def test_cannot_add_empty_list_items(browser, live_server_url):
 
     # She receives a similar warning on the list page
     elem = wait_for(browser.find_element_by_css_selector, '.has-error', wait_time=1)
-    assert "You can'n have an empty list item" in elem.text
+    assert "You can't have an empty list item" in elem.text
 
     # And she can correct it by filling some text in
     get_new_item_input_box(browser).send_keys('Make tea', Keys.ENTER)

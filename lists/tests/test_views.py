@@ -118,3 +118,12 @@ def test_displays_all_items(client):
     page_text = response.content.decode()
     assert 'itemey 1' in page_text
     assert 'itemey 2' in page_text
+
+
+def test_validation_errors_end_up_on_lists_page(client, test_case):
+    list_ = List.objects.create()
+    response = client.post(f'/lists/{list_.id}/', data={'item_text': ''})
+
+    assert response.status_code == 200
+    assert test_case.assertTemplateUsed('list.html')
+    test_case.assertContains(response, escape("You can't have an empty list item"))
