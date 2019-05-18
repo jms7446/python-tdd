@@ -59,5 +59,5 @@ def wait_for(func, *args, wait_time=MAX_WAIT, **kwargs):
                 raise
 
 
-def find_item_input_box(browser):
+def find_item_input_box(browser: Chrome):
     return browser.find_element_by_id('id_text')
