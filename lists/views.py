@@ -3,10 +3,11 @@ from django.http import HttpRequest
 from django.core.exceptions import ValidationError
 
 from lists.models import Item, List
+from lists.forms import ItemForm
 
 
 def home_page(request: HttpRequest):
-    return render(request, 'home.html')
+    return render(request, 'home.html', context={'form': ItemForm()})
 
 
 def view_list(request, list_id):

@@ -5,6 +5,7 @@ from django.utils.html import escape
 
 from lists.views import home_page
 from lists.models import Item, List
+from lists.forms import ItemForm
 
 
 ################################################################################
@@ -19,6 +20,11 @@ def test_root_url_resolvers_to_home_page_view():
 def test_uses_home_templates(client, test_case):
     response = client.get('/')
     test_case.assertTemplateUsed(response, 'home.html')
+
+
+def test_home_page_uses_item_form(client):
+    response = client.get('/')
+    assert isinstance(response.context['form'], ItemForm)
 
 
 ################################################################################
