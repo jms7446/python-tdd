@@ -175,3 +175,14 @@ def test_for_invalid_input_passes_form_to_template_in_item_list(client):
 def test_for_invalid_input_shows_error_on_page(client, test_case):
     response = post_invalid_input_to_list_view(client)
     test_case.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+
+@pytest.mark.skip
+def test_duplicate_item_validation_errors_end_up_on_lists_page(client):
+    list_ = List.objects.create()
+    Item.objects.create(list=list_, text='textey')
+    response = client.post(f'/lists/{list_.id}/', data={'text': 'textey'})
+
+    SimpleTestCase().assertContains(response, escape("You've already got this in your list"))
+    SimpleTestCase().assertTemplateUsed(response, 'list.html')
+    assert Item.objects.count() == 1
