@@ -5,7 +5,7 @@ from django.utils.html import escape
 
 from lists.views import home_page
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR, ExistingListItemForm
 
 
 ################################################################################
@@ -137,7 +137,7 @@ def test_displays_all_items(client):
 def test_displays_item_form(client, test_case):
     list_ = List.objects.create()
     response = client.get(f'/lists/{list_.id}/')
-    assert isinstance(response.context['form'], ItemForm)
+    assert isinstance(response.context['form'], ExistingListItemForm)
     test_case.assertContains(response, 'name="text"')
 
 
@@ -169,7 +169,7 @@ def test_for_invalid_input_renders_list_template(client, test_case):
 
 def test_for_invalid_input_passes_form_to_template_in_item_list(client):
     response = post_invalid_input_to_list_view(client)
-    assert isinstance(response.context['form'], ItemForm)
+    assert isinstance(response.context['form'], ExistingListItemForm)
 
 
 def test_for_invalid_input_shows_error_on_page(client, test_case):
@@ -177,12 +177,11 @@ def test_for_invalid_input_shows_error_on_page(client, test_case):
     test_case.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
 
-@pytest.mark.skip
 def test_duplicate_item_validation_errors_end_up_on_lists_page(client):
     list_ = List.objects.create()
     Item.objects.create(list=list_, text='textey')
     response = client.post(f'/lists/{list_.id}/', data={'text': 'textey'})
 
-    SimpleTestCase().assertContains(response, escape("You've already got this in your list"))
+    SimpleTestCase().assertContains(response, escape(DUPLICATE_ITEM_ERROR))
     SimpleTestCase().assertTemplateUsed(response, 'list.html')
     assert Item.objects.count() == 1

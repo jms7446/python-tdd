@@ -23,7 +23,8 @@ def test_form_validation_for_blank_items():
 def test_form_save_handles_saving_to_a_list():
     list_ = List.objects.create()
     form = ItemForm(data={'text': 'do me'})
-    new_item = form.save(for_list=list_)
+    form.set_list(list_)
+    new_item = form.save()
 
     assert new_item == Item.objects.first()
     assert new_item.text == 'do me'
@@ -54,3 +55,11 @@ def test_for_existing_list_form_save_handles_saving_to_a_list():
 
     assert not form.is_valid()
     assert form.errors['text'] == [DUPLICATE_ITEM_ERROR]
+
+
+def test_for_existing_list_form_save():
+    list_ = List.objects.create()
+    form = ExistingListItemForm(for_list=list_, data={'text': 'hi'})
+    new_item = form.save()
+    assert new_item == Item.objects.first()
+
