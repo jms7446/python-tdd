@@ -3,18 +3,10 @@ import sys
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate
+from django.core.mail import send_mail
 from django.contrib.auth import login as auth_login, logout as auth_logout
 
 from accounts.models import Token
-
-
-def send_mail(title, content, fr):
-    print('=' * 80)
-    print('= send mail')
-    print(title)
-    print(content)
-    print(fr)
-    print('=' * 80)
 
 
 def send_login_email(request):
@@ -27,6 +19,7 @@ def send_login_email(request):
         'Your login link for Superlists',
         f'Use this link to log in: \n\n{url}',
         'noreply@superlists',
+        [email],
     )
     return render(request, 'login_email_sent.html')
 
