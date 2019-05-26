@@ -11,7 +11,6 @@ def test_can_start_a_list_for_one_user(browser, live_server_url):
     browser.get(live_server_url)
 
     # she notices the page title and header mention to-do lists
-    print(browser.title)
     assert 'To-Do' in browser.title
     header_text = browser.find_element_by_tag_name('h1').text
     assert 'To-Do' in header_text
