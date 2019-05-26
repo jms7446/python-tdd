@@ -60,7 +60,7 @@ class MailChecker:
             self.inbox.quit()
         inbox = poplib.POP3_SSL('pop.gmail.com')
         inbox.user(TEST_EMAIL)
-        inbox.pass_('rhdrodyd')
+        inbox.pass_(os.environ.get('EMAIL_PASSWORD'))
         self.inbox = inbox
 
     def get_mail_count(self):
