@@ -36,6 +36,10 @@ def test_can_get_email_link_to_log_in(browser, live_server_url):
     browser.get(url)
 
     # she is logged in!
-    wait_for(browser.find_element_by_link_text, 'Log out')
-    navbar = browser.find_element_by_css_selector('.navbar')
-    assert TEST_EMAIL in navbar.text
+    wait_to_be_logged_in(browser, TEST_EMAIL)
+
+    # Now she logs out
+    browser.find_element_by_link_text('Log out').click()
+
+    # She is logged out
+    wait_to_be_logged_out(browser, TEST_EMAIL)
