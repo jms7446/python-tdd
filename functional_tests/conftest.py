@@ -10,6 +10,7 @@ from selenium.webdriver import Chrome
 from pytest import fixture
 
 from util import make_driver
+from .server_tools import reset_database
 
 MAX_WAIT = 2
 WAIT_INTERVAL = 0.2
@@ -55,9 +56,18 @@ def live_server_url(live_server):
     staging_server = os.environ.get('STAGING_SERVER')
     if staging_server:
         url = 'http://' + staging_server
+        reset_database(staging_server)
     else:
         url = live_server.url
     yield url
+
+
+def get_staging_server():
+    return os.environ.get('STAGING_SERVER')
+
+
+def is_staging_server():
+    return bool(os.environ.get('STAGING_SERVER'))
 
 
 @wait
@@ -73,22 +83,6 @@ def assert_text_in_table_rows(table_elem, row_text):
 
 def find_item_input_box(browser: Chrome):
     return browser.find_element_by_id('id_text')
-
-
-def create_pre_authenticated_session(email, browser, server_url):
-    user = User.objects.create(email=email)
-    session = SessionStore()
-    session[SESSION_KEY] = user.pk
-    session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
-    session.save()
-    ## to set a cookie we need to first visit the domain.
-    ## 404 pages load the quickest!
-    browser.get(server_url + "/404_no_such_url/")
-    browser.add_cookie(dict(
-        name=settings.SESSION_COOKIE_NAME,
-        value=session.session_key,
-        path='/',
-    ))
 
 
 @wait(wait_time=3)
